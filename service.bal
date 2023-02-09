@@ -1,17 +1,23 @@
 import ballerina/http;
 
-# A service representing a network-accessible API
-# bound to port `9090`.
-service / on new http:Listener(9090) {
+type Details record{
+    string clientId;
+    string consentId;
+};
 
-    # A resource for generating greetings
-    # + name - the input string name
-    # + return - string name with hello message or error
-    resource function get greeting(string name) returns string|error {
-        // Send a response back to the caller.
-        if name is "" {
-            return error("name should not be empty!");
+service /consent on new http:Listener(9090) {
+
+    resource function post initiate(@http:Payload Details details) returns string|error {
+        if details.clientId is "" {
+            return error("A valid client ID must be provided");
         }
-        return "Hello, " + name;
+        return "Consent with consent ID " + details.consentId + " succesfully initiated";
+    }
+
+    resource function get [string consentId]() returns string|error {
+        if consentId is "" {
+            return error("A Consent ID must be given");
+        }
+        return "Consent resource";
     }
 }
